@@ -46,15 +46,14 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Publish to npm
-        if: ${{ github.event_name == 'push' && env.NPM_TOKEN != '' }}
+        if: ${{ github.event_name == 'push' && secrets.NPM_TOKEN != '' }}
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public
-        continue-on-error: false
 
       - name: Skip notice
-        if: ${{ github.event_name == 'workflow_dispatch' || env.NPM_TOKEN == '' }}
-        run: echo "npm publish skipped (dry run or NPM_TOKEN secret not configured)"
+        if: ${{ github.event_name == 'workflow_dispatch' || secrets.NPM_TOKEN == '' }}
+        run: echo "npm publish skipped (dry run, or NPM_TOKEN secret not configured)"
 
       - name: Build artifacts
         run: |
