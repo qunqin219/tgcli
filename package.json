@@ -1,0 +1,39 @@
+{
+  "name": "tgcli",
+  "version": "0.1.0",
+  "description": "Dependency-free Telegram Bot API CLI with a local ledger, so you can actually see what you sent",
+  "type": "module",
+  "bin": {
+    "tgcli": "bin/tgcli.js"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "lint": "node --check bin/tgcli.js && node -e \"import('./src/cli.js').then(()=>console.log('ok'))\""
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "cli",
+    "bot-api",
+    "telegram-bot"
+  ],
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qunqin24/tgcli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/qunqin24/tgcli/issues"
+  },
+  "homepage": "https://github.com/qunqin24/tgcli#readme"
+}

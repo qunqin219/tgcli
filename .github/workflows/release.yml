@@ -1,0 +1,85 @@
+name: release
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build and create the GitHub release, skip npm publish'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Tag must match package.json
+        id: meta
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          echo "version=$PKG" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "v$PKG" != "${GITHUB_REF_NAME}" ]; then
+            echo "tag ${GITHUB_REF_NAME} does not match package.json v$PKG" >&2
+            exit 1
+          fi
+      - run: node --test test/
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Publish to npm
+        if: ${{ github.event_name == 'push' && env.NPM_TOKEN != '' }}
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
+        continue-on-error: false
+
+      - name: Skip notice
+        if: ${{ github.event_name == 'workflow_dispatch' || env.NPM_TOKEN == '' }}
+        run: echo "npm publish skipped (dry run or NPM_TOKEN secret not configured)"
+
+      - name: Build artifacts
+        run: |
+          npm pack
+          sha256sum *.tgz > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Extract changelog section
+        id: notes
+        run: |
+          node - "${{ needs.verify.outputs.version }}" <<'JS'
+          const fs = require('node:fs');
+          const version = process.argv[2];
+          const text = fs.readFileSync('CHANGELOG.md', 'utf8');
+          const start = text.indexOf(`## [${version}]`);
+          const body = start === -1 ? text : text.slice(start, text.indexOf('\n## [', start + 3) === -1 ? undefined : text.indexOf('\n## [', start + 3));
+          fs.writeFileSync('RELEASE_NOTES.md', body.trim() + '\n');
+          JS
+          head -20 RELEASE_NOTES.md
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE_NOTES.md
+          files: |
+            *.tgz
+            SHA256SUMS.txt
+          fail_on_unmatched_files: true
