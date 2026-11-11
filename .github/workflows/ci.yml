@@ -27,7 +27,7 @@ jobs:
           node --check src/cli.js
           node --check src/store.js
       - name: Test
-        run: node --test test/
+        run: node --test
       - name: CLI smoke (help + version)
         run: |
           node bin/tgcli.js version

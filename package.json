@@ -17,7 +17,7 @@
     "node": ">=18.17"
   },
   "scripts": {
-    "test": "node --test test/",
+    "test": "node --test",
     "lint": "node --check bin/tgcli.js && node -e \"import('./src/cli.js').then(()=>console.log('ok'))\""
   },
   "keywords": [
