@@ -30,10 +30,10 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qunqin24/tgcli.git"
+    "url": "git+https://github.com/qunqin219/tgcli.git"
   },
   "bugs": {
-    "url": "https://github.com/qunqin24/tgcli/issues"
+    "url": "https://github.com/qunqin219/tgcli/issues"
   },
-  "homepage": "https://github.com/qunqin24/tgcli#readme"
+  "homepage": "https://github.com/qunqin219/tgcli#readme"
 }

@@ -74,7 +74,7 @@ tgcli listen --once --timeout 25
 ## Development
 
 ```bash
-git clone https://github.com/qunqin24/tgcli
+git clone https://github.com/qunqin219/tgcli
 cd tgcli
 node --test test/
 ```
